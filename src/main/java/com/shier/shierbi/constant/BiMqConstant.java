@@ -39,7 +39,7 @@ public interface BiMqConstant {
     /**
      * MQ ip地址
      */
-    String BI_MQ_HOST = "xxx.xxx.xxx.xx";
+    String BI_MQ_HOST = "123.456.789";
     /**
      * MQ 用户名
      */
