@@ -36,7 +36,7 @@ spring:
       max-file-size: 1MB
   # rabbitmq 信息
   rabbitmq:
-    host: 8.1335478.2453
+    host: xxxxx
     password: xxx
     username: shier
     port: 5672

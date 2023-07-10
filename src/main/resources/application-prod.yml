@@ -26,7 +26,7 @@ spring:
     password: xxxx
   # rabbitmq 信息
   rabbitmq:
-    host: xxx
+    host: 8.1346.467
     password: xxxxx
     username: shier
     port: 5672
