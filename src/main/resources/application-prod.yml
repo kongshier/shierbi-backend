@@ -1,0 +1,48 @@
+server:
+  port: 8103
+  servlet:
+    context-path: /api
+    session:
+      cookie:
+        domain: bi.kongshier.top
+        same-site: lax
+        secure: false
+spring:
+  # DataSource Config
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://xxxxx:3306/shierbi?useUnicode=true&characterEncoding=utf-8&serverTimezone=GMT%2B8&useSSL=false
+    username: root
+    password: shier
+  # session 失效时间 30 天
+  session:
+    timeout: 2592000
+    store-type: none
+  # redis配置
+  redis:
+    port: 6379
+    host: 8.222
+    database: 1
+    password: xxxx
+  # rabbitmq 信息
+  rabbitmq:
+    host: xxx
+    password: xxxxx
+    username: shier
+    port: 5672
+    listener:
+      direct:
+        acknowledge-mode: manual
+mybatis-plus:
+  configuration:
+    # 生产环境关闭日志
+    log-impl: ''
+# 要使用的模型ID
+ai:
+  model:
+    model-id: 1660100329896673281
+# 鱼聪明SDK
+yuapi:
+  client:
+    access-key: xxxxx
+    secret-key: xxxxx

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.shier.shierbi.mapper.AiAssistantMapper">
+
+    <resultMap id="BaseResultMap" type="com.shier.shierbi.model.entity.AiAssistant">
+            <id property="id" column="id" jdbcType="BIGINT"/>
+            <result property="questionName" column="questionName" jdbcType="VARCHAR"/>
+            <result property="questionGoal" column="questionGoal" jdbcType="VARCHAR"/>
+            <result property="questionResult" column="questionResult" jdbcType="VARCHAR"/>
+            <result property="questionType" column="questionType" jdbcType="VARCHAR"/>
+            <result property="questionStatus" column="questionStatus" jdbcType="VARCHAR"/>
+            <result property="execMessage" column="execMessage" jdbcType="VARCHAR"/>
+            <result property="userId" column="userId" jdbcType="BIGINT"/>
+            <result property="createTime" column="createTime" jdbcType="TIMESTAMP"/>
+            <result property="updateTime" column="updateTime" jdbcType="TIMESTAMP"/>
+            <result property="isDelete" column="isDelete" jdbcType="TINYINT"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,questionName,questionGoal,
+        questionResult,questionType,questionStatus,
+        execMessage,userId,createTime,
+        updateTime,isDelete
+    </sql>
+</mapper>
