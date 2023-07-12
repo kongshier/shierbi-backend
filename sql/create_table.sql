@@ -60,3 +60,45 @@ create table if not exists ai_assistant
     updateTime     datetime     default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '更新时间',
     isDelete       tinyint      default 0                 not null comment '是否删除'
 ) comment 'AI 问答助手信息表' collate = utf8mb4_unicode_ci;
+
+
+-- AI调用次数表
+create table if not exists ai_frequency
+(
+    id              bigint auto_increment comment 'id' primary key,
+    userId          bigint                             not null comment '用户 id',
+    totalFrequency  bigint   default 0                 not null comment '总调用次数',
+    remainFrequency int      default 5                 not null comment '剩余调用次数',
+    createTime      datetime default CURRENT_TIMESTAMP not null comment '创建时间',
+    updateTime      datetime default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '更新时间',
+    isDelete        tinyint  default 0                 not null comment '是否删除'
+) comment 'ai调用次数表' collate = utf8mb4_unicode_ci;
+
+-- 订单表
+create table if not exists ai_frequency_order
+(
+    id               bigint auto_increment comment 'id' primary key,
+    userId           bigint                             not null comment '用户 id',
+    purchaseQuantity bigint(0)                          NOT NULL COMMENT '购买数量',
+    price            float(255, 2)                      NOT NULL COMMENT '单价',
+    totalAmount      float(10, 2)                       NOT NULL COMMENT '交易金额',
+    orderStatus      int(0)                             NOT NULL DEFAULT 0 COMMENT '交易状态【0->待付款；1->已完成；2->无效订单】',
+    createTime       datetime default CURRENT_TIMESTAMP not null comment '创建时间',
+    updateTime       datetime default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '更新时间',
+    isDelete         tinyint  default 0                 not null comment '是否删除'
+) comment '次数订单表' collate = utf8mb4_unicode_ci;
+
+-- 支付记录表
+create table if not exists alipay_info
+(
+    id            bigint auto_increment comment 'id' primary key,
+    userId        bigint                             not null comment '用户 id',
+    alipayAccountNo bigint                             not null comment '支付宝流水账号',
+    alipayId      varchar(1024) comment '支付宝唯一id',
+    orderId       bigint comment '订单id',
+    totalAmount   float(10, 2)                       NOT NULL COMMENT '交易金额',
+    payStatus     int(0)                             NOT NULL DEFAULT 0 COMMENT '交易状态【0->待付款；1->已完成；2->无效订单】',
+    createTime    datetime default CURRENT_TIMESTAMP not null comment '支付时间',
+    updateTime    datetime default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '更新时间',
+    isDelete      tinyint  default 0                 not null comment '是否删除'
+) comment '次数订单表' collate = utf8mb4_unicode_ci;

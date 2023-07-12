@@ -39,8 +39,8 @@ import javax.servlet.http.HttpServletRequest;
 @RequestMapping("/chart")
 @Slf4j
 @Api(tags = "ChartController")
-@CrossOrigin(origins = "http://bi.kongshier.top", allowCredentials = "true")
-//@CrossOrigin(origins = "http://localhost:8000", allowCredentials = "true")
+//@CrossOrigin(origins = "http://bi.kongshier.top", allowCredentials = "true")
+@CrossOrigin(origins = "http://localhost:8000", allowCredentials = "true")
 public class ChartController {
 
     @Resource
@@ -265,10 +265,10 @@ public class ChartController {
     }
 
     /**
-     * 图表文件上传（异步）
+     * 图表文件上传（异步-线程池）
      */
     @PostMapping("/gen/async")
-    @ApiOperation(value = "异步图表文件上传")
+    @ApiOperation(value = "异步线程池图表文件上传")
     public BaseResponse<BiResponse> genChartByAiAsync(@RequestPart("file") MultipartFile multipartFile,
                                                  GenChartByAiRequest genChartByAiRequest, HttpServletRequest request) {
         String chartName = genChartByAiRequest.getChartName();

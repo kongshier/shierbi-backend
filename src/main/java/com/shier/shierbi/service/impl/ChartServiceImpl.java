@@ -14,6 +14,7 @@ import com.shier.shierbi.model.entity.Chart;
 import com.shier.shierbi.model.entity.User;
 import com.shier.shierbi.model.enums.ChartStatusEnum;
 import com.shier.shierbi.model.vo.BiResponse;
+import com.shier.shierbi.service.AiFrequencyService;
 import com.shier.shierbi.service.ChartService;
 import com.shier.shierbi.service.UserService;
 import com.shier.shierbi.utils.ChartUtils;
@@ -38,6 +39,9 @@ public class ChartServiceImpl extends ServiceImpl<ChartMapper, Chart> implements
 
     @Resource
     private UserService userService;
+
+    @Resource
+    private AiFrequencyService aiFrequencyService;
 
     @Resource
     private AiManager aiManager;
@@ -65,6 +69,13 @@ public class ChartServiceImpl extends ServiceImpl<ChartMapper, Chart> implements
         String goal = genChartByAiRequest.getGoal();
         String chartType = genChartByAiRequest.getChartType();
         User loginUser = userService.getLoginUser(request);
+
+        // 查询是否有调用次数
+        boolean hasFrequency = aiFrequencyService.hasFrequency(loginUser.getId());
+        if (!hasFrequency) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "剩余次数不足，请先充值！");
+        }
+
         // 校验
         ThrowUtils.throwIf(StringUtils.isBlank(goal), ErrorCode.PARAMS_ERROR, "图表分析目标为空");
         ThrowUtils.throwIf(StringUtils.isNotBlank(chartName) && chartName.length() > 200, ErrorCode.PARAMS_ERROR, "图表名称过长");
@@ -134,11 +145,15 @@ public class ChartServiceImpl extends ServiceImpl<ChartMapper, Chart> implements
         biResponse.setGenChart(preGenChart);
         biResponse.setChartId(chart.getId());
         biResponse.setGenResult(genResult);
+        // 调用次数减一
+        boolean invokeAutoDecrease = aiFrequencyService.invokeAutoDecrease(loginUser.getId());
+        ThrowUtils.throwIf(!invokeAutoDecrease, ErrorCode.PARAMS_ERROR, "次数减一失败");
+
         return biResponse;
     }
 
     /**
-     * 异步图表生成
+     * 异步图表生成-线程池
      *
      * @param multipartFile       用户上传的文件信息
      * @param genChartByAiRequest 用户的需求
@@ -151,6 +166,13 @@ public class ChartServiceImpl extends ServiceImpl<ChartMapper, Chart> implements
         String goal = genChartByAiRequest.getGoal();
         String chartType = genChartByAiRequest.getChartType();
         User loginUser = userService.getLoginUser(request);
+
+        // 查询是否有调用次数
+        boolean hasFrequency = aiFrequencyService.hasFrequency(loginUser.getId());
+        if (!hasFrequency) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "剩余次数不足，请先充值！");
+        }
+
         // 校验
         ThrowUtils.throwIf(StringUtils.isBlank(goal), ErrorCode.PARAMS_ERROR, "图表分析目标为空");
         ThrowUtils.throwIf(StringUtils.isNotBlank(chartName) && chartName.length() > 200, ErrorCode.PARAMS_ERROR, "图表名称过长");
@@ -267,6 +289,11 @@ public class ChartServiceImpl extends ServiceImpl<ChartMapper, Chart> implements
         // 返回到前端
         BiResponse biResponse = new BiResponse();
         biResponse.setChartId(chart.getId());
+
+        // 调用次数减一
+        boolean invokeAutoDecrease = aiFrequencyService.invokeAutoDecrease(loginUser.getId());
+        ThrowUtils.throwIf(!invokeAutoDecrease, ErrorCode.PARAMS_ERROR, "次数减一失败");
+
         return biResponse;
     }
 
@@ -285,6 +312,12 @@ public class ChartServiceImpl extends ServiceImpl<ChartMapper, Chart> implements
         String goal = genChartByAiRequest.getGoal();
         String chartType = genChartByAiRequest.getChartType();
         User loginUser = userService.getLoginUser(request);
+
+        // 查询是否有调用次数
+        boolean hasFrequency = aiFrequencyService.hasFrequency(loginUser.getId());
+        if (!hasFrequency) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "剩余次数不足，请先充值！");
+        }
         // 校验
         ThrowUtils.throwIf(StringUtils.isBlank(goal), ErrorCode.PARAMS_ERROR, "图表分析目标为空");
         ThrowUtils.throwIf(StringUtils.isNotBlank(chartName) && chartName.length() > 200, ErrorCode.PARAMS_ERROR, "图表名称过长");
@@ -341,6 +374,10 @@ public class ChartServiceImpl extends ServiceImpl<ChartMapper, Chart> implements
         // 返回到前端
         BiResponse biResponse = new BiResponse();
         biResponse.setChartId(chart.getId());
+
+        // 调用次数减一
+        boolean invokeAutoDecrease = aiFrequencyService.invokeAutoDecrease(loginUser.getId());
+        ThrowUtils.throwIf(!invokeAutoDecrease, ErrorCode.PARAMS_ERROR, "次数减一失败");
         return biResponse;
     }
 

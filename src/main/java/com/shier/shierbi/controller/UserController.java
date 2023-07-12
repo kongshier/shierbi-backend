@@ -20,7 +20,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -64,31 +63,6 @@ public class UserController {
         long result = userService.userRegister(userRegisterRequest);
         return ResultUtils.success(result);
     }
-
-    /**
-     * 用户注册
-     *
-     * @param userRegisterRequest
-     * @return
-     */
-    @PostMapping("/registerfile")
-    @ApiOperation(value = "用户注册和头像上传")
-    public BaseResponse<Long> userRegisterFile(@RequestPart("file") MultipartFile file,UserRegisterRequest userRegisterRequest) {
-        if (userRegisterRequest == null) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR);
-        }
-        String userAccount = userRegisterRequest.getUserAccount();
-        String userPassword = userRegisterRequest.getUserPassword();
-        String checkPassword = userRegisterRequest.getCheckPassword();
-        if (StringUtils.isAnyBlank(userAccount, userPassword, checkPassword)) {
-            throw new BusinessException(ErrorCode.NULL_ERROR,"参数为空");
-        }
-        // 上传文件为空
-        ThrowUtils.throwIf(file==null,ErrorCode.NULL_ERROR);
-        long result = userService.userRegisterFile(userRegisterRequest,file);
-        return ResultUtils.success(result);
-    }
-
 
     /**
      * 用户登录
@@ -190,6 +164,26 @@ public class UserController {
     @ApiOperation(value = "管理员更新用户信息")
     @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
     public BaseResponse<Boolean> updateUser(@RequestBody UserUpdateRequest userUpdateRequest,
+                                            HttpServletRequest request) {
+        if (userUpdateRequest == null || userUpdateRequest.getId() == null) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        User user = new User();
+        BeanUtils.copyProperties(userUpdateRequest, user);
+        boolean result = userService.updateById(user);
+        ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR);
+        return ResultUtils.success(true);
+    }
+
+    /**
+     * 用户更新信息
+     * @param userUpdateRequest
+     * @param request
+     * @return
+     */
+    @PostMapping("/update/user")
+    @ApiOperation(value = "更新用户信息")
+    public BaseResponse<Boolean> updateByProfileUser(@RequestBody UserUpdateRequest userUpdateRequest,
                                             HttpServletRequest request) {
         if (userUpdateRequest == null || userUpdateRequest.getId() == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);

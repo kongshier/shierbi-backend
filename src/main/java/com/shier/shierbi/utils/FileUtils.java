@@ -1,15 +1,16 @@
 package com.shier.shierbi.utils;
 
+
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
- * 常量类，读取配置文件application.properties中的配置
+ * 常量类，读取配置文件application.yml中的配置
  * @author Shier
  */
 @Component
-public class OssUtil implements InitializingBean {
+public class FileUtils implements InitializingBean {
 
     public static String END_POINT;
     public static String KEY_ID;
@@ -31,5 +32,4 @@ public class OssUtil implements InitializingBean {
         END_POINT = this.endpoint;
         BUCKET_NAME = this.bucketname;
     }
-
 }

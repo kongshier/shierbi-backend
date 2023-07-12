@@ -7,12 +7,13 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- * AI 问答助手信息表
+ * ai调用次数表
  * @author Shier
- * @TableName ai_assistant
+ * @TableName ai_frequency
  */
+@TableName(value ="ai_frequency")
 @Data
-public class AiAssistant implements Serializable {
+public class AiFrequency implements Serializable {
     /**
      * id
      */
@@ -20,39 +21,19 @@ public class AiAssistant implements Serializable {
     private Long id;
 
     /**
-     * 问题名称
-     */
-    private String questionName;
-
-    /**
-     * 问题概述
-     */
-    private String questionGoal;
-
-    /**
-     * 问答结果
-     */
-    private String questionResult;
-
-    /**
-     * 问题类型
-     */
-    private String questionType;
-
-    /**
-     * wait-等待,running-生成中,succeed-成功生成,failed-生成失败
-     */
-    private String questionStatus;
-
-    /**
-     * 执行信息
-     */
-    private String execMessage;
-
-    /**
-     * 创建用户 id
+     * 用户 id
      */
     private Long userId;
+
+    /**
+     * 总调用次数
+     */
+    private Integer totalFrequency;
+
+    /**
+     * 剩余调用次数
+     */
+    private Integer remainFrequency;
 
     /**
      * 创建时间

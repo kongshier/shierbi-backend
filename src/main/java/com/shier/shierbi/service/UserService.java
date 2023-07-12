@@ -9,7 +9,6 @@ import com.shier.shierbi.model.dto.user.UserUpdateMyRequest;
 import com.shier.shierbi.model.entity.User;
 import com.shier.shierbi.model.vo.LoginUserVO;
 import com.shier.shierbi.model.vo.UserVO;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
@@ -27,13 +26,6 @@ public interface UserService extends IService<User> {
      * @return
      */
     long userRegister(UserRegisterRequest userRegisterRequest);
-
-    /**
-     * 用户注册
-     * @param userRegisterRequest
-     * @return
-     */
-    long userRegisterFile(UserRegisterRequest userRegisterRequest, MultipartFile file);
 
     /**
      * 用户登录

@@ -13,11 +13,12 @@ import com.shier.shierbi.model.dto.user.UserAddRequest;
 import com.shier.shierbi.model.dto.user.UserQueryRequest;
 import com.shier.shierbi.model.dto.user.UserRegisterRequest;
 import com.shier.shierbi.model.dto.user.UserUpdateMyRequest;
+import com.shier.shierbi.model.entity.AiFrequency;
 import com.shier.shierbi.model.entity.User;
 import com.shier.shierbi.model.enums.UserRoleEnum;
 import com.shier.shierbi.model.vo.LoginUserVO;
 import com.shier.shierbi.model.vo.UserVO;
-import com.shier.shierbi.service.OssService;
+import com.shier.shierbi.service.AiFrequencyService;
 import com.shier.shierbi.service.UserService;
 import com.shier.shierbi.utils.SqlUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -25,7 +26,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -47,7 +47,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     private UserMapper userMapper;
 
     @Resource
-    private OssService ossService;
+    private AiFrequencyService aiFrequencyService;
 
     /**
      * 用户注册
@@ -93,57 +93,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             if (!saveResult) {
                 throw new BusinessException(ErrorCode.SYSTEM_ERROR, "注册失败，数据库错误");
             }
-            return user.getId();
-        }
-    }
-    /**
-     * 用户注册
-     * @param userRegisterRequest
-     * @return
-     */
-    @Override
-    public long userRegisterFile(UserRegisterRequest userRegisterRequest,MultipartFile file) {
-        String userAccount = userRegisterRequest.getUserAccount();
-        String userPassword = userRegisterRequest.getUserPassword();
-        String checkPassword = userRegisterRequest.getCheckPassword();
-        String userCode = userRegisterRequest.getUserCode();
-        // 校验
-        if (StringUtils.isAnyBlank(userAccount, userPassword, checkPassword)) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR, "参数为空");
-        }
-        if (userAccount.length() < 4) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR, "用户账号过短");
-        }
-        if (userPassword.length() < 8 || checkPassword.length() < 8) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR, "用户密码过短");
-        }
-        // 密码和校验密码相同
-        if (!userPassword.equals(checkPassword)) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR, "两次输入的密码不一致");
-        }
-        // 校验文件
-        String uploadFileAvatar = ossService.uploadFileAvatar(file);
-        ThrowUtils.throwIf(StringUtils.isBlank(uploadFileAvatar),ErrorCode.NULL_ERROR,"头像上传失败");
 
-        synchronized (userAccount.intern()) {
-            // 账户和编号不能重复
-            isCodeAndAccountExist(userAccount, userCode);
+            // 用户注册，保存用户调用次数
+            AiFrequency aiFrequency = new AiFrequency();
+            aiFrequency.setUserId(user.getId());
+            aiFrequencyService.save(aiFrequency);
 
-            // 3. 加密
-            String encryptPassword = DigestUtils.md5DigestAsHex((SALT + userPassword).getBytes());
-
-            // 4. 插入数据
-            User user = new User();
-            user.setUserAccount(userAccount);
-            user.setUserName(userAccount);
-            user.setUserPassword(encryptPassword);
-            //user.setUserAvatar(DEFAULT_AVATAR);
-            user.setUserAvatar(uploadFileAvatar);
-            user.setUserCode(userCode);
-            boolean saveResult = this.save(user);
-            if (!saveResult) {
-                throw new BusinessException(ErrorCode.SYSTEM_ERROR, "注册失败，数据库错误");
-            }
             return user.getId();
         }
     }

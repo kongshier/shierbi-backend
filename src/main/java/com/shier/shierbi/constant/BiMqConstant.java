@@ -33,20 +33,23 @@ public interface BiMqConstant {
      * AI 问答
      */
     String AI_QUESTION_EXCHANGE_NAME = "ai_question_exchange";
+
     String AI_QUESTION_QUEUE = "ai_question_queue";
     String AI_QUESTION_ROUTING_KEY = "ai_question_routingKey";
 
     /**
      * MQ ip地址
      */
-    String BI_MQ_HOST = "123.456.789.123";
+    String BI_MQ_HOST = "8.134.37.7";
+
     /**
      * MQ 用户名
      */
     String BI_MQ_USERNAME = "shier";
+
     /**
      * MQ 密码
      */
-    String BI_MQ_PASSWORD = "xxx.xxx.xx.xx";
+    String BI_MQ_PASSWORD = "kcsen123456";
 
 }
