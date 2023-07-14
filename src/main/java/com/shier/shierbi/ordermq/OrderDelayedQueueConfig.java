@@ -14,7 +14,6 @@ import java.util.Map;
  */
 @Configuration
 public class OrderDelayedQueueConfig {
-
     // 普通交换机的名称
     public static final String X_EXCHANGE="order_exchange";
     // 死信交换机的名称
@@ -36,7 +35,7 @@ public class OrderDelayedQueueConfig {
         return new DirectExchange(Y_DEAD_LETTER_EXCHANGE);
     }
 
-    //声明普通队列  要有ttl 为600s
+    // 声明普通队列  要有ttl 为600s
     @Bean("queueA")
     public Queue queueA(){
         Map<String,Object> arguments = new HashMap<>(3);

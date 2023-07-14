@@ -136,8 +136,8 @@ public class AliPayController {
             throw new BusinessException(ErrorCode.NOT_LOGIN_ERROR);
         }
         long alipayAccountNo = alipayInfoService.getPayNo(orderId, loginUser.getId());
-        String url = String.format("http://8.134.37.7:8103/api/alipay/pay?alipayAccountNo=%s", alipayAccountNo);
-        //String url = String.format("http://192.168.11.219:8103/api/alipay/pay?alipayAccountNo=%s", alipayAccountNo);
+        //String url = String.format("http://8.134.37.7:8103/api/alipay/pay?alipayAccountNo=%s", alipayAccountNo);
+        String url = String.format("http://192.168.11.219:8103/api/alipay/pay?alipayAccountNo=%s", alipayAccountNo);
         String generateQrCode = QrCodeUtil.generateAsBase64(url, new QrConfig(400, 400), "png");
         AlipayInfoVO alipayInfoVO = new AlipayInfoVO();
         alipayInfoVO.setAlipayAccountNo(String.valueOf(alipayAccountNo));
@@ -194,7 +194,7 @@ public class AliPayController {
         if (aiFrequency == null) {
             AiFrequency frequency = new AiFrequency();
             frequency.setUserId(userId);
-            frequency.setTotalFrequency(Integer.valueOf(PayOrderEnum.WAITPAY.getValue()));
+            frequency.setTotalFrequency(Integer.valueOf(PayOrderEnum.WAIT_PAY.getValue()));
             frequency.setRemainFrequency(Math.toIntExact(total));
             boolean save = aiFrequencyService.save(frequency);
             if (!save) {

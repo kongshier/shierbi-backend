@@ -13,9 +13,10 @@ import java.util.stream.Collectors;
  */
 public enum PayOrderEnum {
 
-    WAITPAY("待付款", "0"),
+    WAIT_PAY("待付款", "0"),
     COMPLETE("已完成", "1"),
-    FAILED("无效订单", "2");
+    TIMEOUT_ORDER("超时订单", "2"),
+    CANCEL_ORDER("取消订单", "3");
     private final String text;
 
     private final String value;

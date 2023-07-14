@@ -16,6 +16,7 @@ import com.shier.shierbi.model.dto.order.AiFrequencyOrderQueryRequest;
 import com.shier.shierbi.model.dto.order.AiFrequencyOrderUpdateRequest;
 import com.shier.shierbi.model.entity.AiFrequencyOrder;
 import com.shier.shierbi.model.entity.User;
+import com.shier.shierbi.model.enums.PayOrderEnum;
 import com.shier.shierbi.model.vo.AiFrequencyOrderVO;
 import com.shier.shierbi.ordermq.OrderManageProducer;
 import com.shier.shierbi.service.AiFrequencyOrderService;
@@ -184,15 +185,18 @@ public class AiFrequencyOrderController {
     public BaseResponse<Boolean> cancelOrder(@RequestBody AiFrequencyOrderCancelRequest cancelRequest, HttpServletRequest request) {
         Long id = cancelRequest.getId();
         Long userId = cancelRequest.getUserId();
-
+        if (id < 0) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        if (userId < 0) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
         if (cancelRequest == null || cancelRequest.getId() == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
         AiFrequencyOrder order = new AiFrequencyOrder();
         BeanUtils.copyProperties(cancelRequest, order);
-        order.setId(id);
-        order.setOrderStatus(2);
-        order.setUserId(userId);
+        order.setOrderStatus(Integer.valueOf(PayOrderEnum.CANCEL_ORDER.getValue()));
         boolean result = aiFrequencyOrderService.updateById(order);
         ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR);
         return ResultUtils.success(true);

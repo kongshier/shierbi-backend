@@ -37,7 +37,6 @@ import java.util.List;
 //@CrossOrigin(origins = "http://bi.kongshier.top", allowCredentials = "true")
 @CrossOrigin(origins = "http://localhost:8000", allowCredentials = "true")
 public class UserController {
-
     @Resource
     private UserService userService;
 
