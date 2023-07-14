@@ -7,7 +7,7 @@
     <resultMap id="BaseResultMap" type="com.shier.shierbi.model.entity.AlipayInfo">
             <id property="id" column="id" jdbcType="BIGINT"/>
             <result property="userId" column="userId" jdbcType="BIGINT"/>
-            <result property="alipayAccountNo" column="alipayAccountNo" jdbcType="BIGINT"/>
+            <result property="alipayAccountNo" column="alipayAccountNo" jdbcType="VARCHAR"/>
             <result property="alipayId" column="alipayId" jdbcType="VARCHAR"/>
             <result property="orderId" column="orderId" jdbcType="BIGINT"/>
             <result property="totalAmount" column="totalAmount" jdbcType="FLOAT"/>

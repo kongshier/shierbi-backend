@@ -23,6 +23,7 @@ import com.shier.shierbi.model.entity.AiFrequencyOrder;
 import com.shier.shierbi.model.entity.AlipayInfo;
 import com.shier.shierbi.model.entity.User;
 import com.shier.shierbi.model.enums.PayOrderEnum;
+import com.shier.shierbi.model.vo.AlipayInfoVO;
 import com.shier.shierbi.service.AiFrequencyOrderService;
 import com.shier.shierbi.service.AiFrequencyService;
 import com.shier.shierbi.service.AlipayInfoService;
@@ -126,7 +127,7 @@ public class AliPayController {
      */
     @PostMapping("/payCode")
     @ResponseBody
-    public BaseResponse<String> payCode(long orderId, HttpServletRequest request) {
+    public BaseResponse<AlipayInfoVO> payCode(long orderId, HttpServletRequest request) {
         if (orderId <= 0) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
@@ -135,9 +136,14 @@ public class AliPayController {
             throw new BusinessException(ErrorCode.NOT_LOGIN_ERROR);
         }
         long alipayAccountNo = alipayInfoService.getPayNo(orderId, loginUser.getId());
-        String url = String.format("http://192.168.11.219:8103/api/alipay/pay?alipayAccountNo=%s", alipayAccountNo);
-        String base64 = QrCodeUtil.generateAsBase64(url, new QrConfig(300, 300), "png");
-        return ResultUtils.success(base64);
+        String url = String.format("http://8.134.37.7:8103/api/alipay/pay?alipayAccountNo=%s", alipayAccountNo);
+        //String url = String.format("http://192.168.11.219:8103/api/alipay/pay?alipayAccountNo=%s", alipayAccountNo);
+        String generateQrCode = QrCodeUtil.generateAsBase64(url, new QrConfig(400, 400), "png");
+        AlipayInfoVO alipayInfoVO = new AlipayInfoVO();
+        alipayInfoVO.setAlipayAccountNo(String.valueOf(alipayAccountNo));
+        alipayInfoVO.setQrCode(generateQrCode);
+        alipayInfoVO.setOrderId(orderId);
+        return ResultUtils.success(alipayInfoVO);
     }
 
     /**
@@ -147,11 +153,12 @@ public class AliPayController {
      */
     @Transactional
     @PostMapping("/tradeQuery")
-    public BaseResponse<String> tradeQuery(String alipayAccountNo) throws AlipayApiException {
+    public void tradeQuery(String alipayAccountNo) throws AlipayApiException {
         AlipayClient alipayClient = new DefaultAlipayClient(URL, APP_ID, APP_PRIVATE_KEY, "json", CHARSET, ALIPAY_PUBLIC_KEY, SIGNTYPE);
         AlipayInfo alipayInfo = getTotalAmount(alipayAccountNo);
         Long orderId = alipayInfo.getOrderId();
-        if (orderId == 1) {
+        AiFrequencyOrder orderId1 = getOrder(orderId);
+        if (orderId1.getOrderStatus() == 1) {
             throw new BusinessException(ErrorCode.SYSTEM_ERROR, "你已经支付过了");
         }
         AlipayTradeQueryRequest request = new AlipayTradeQueryRequest();
@@ -160,50 +167,49 @@ public class AliPayController {
 
         request.setBizContent(bizContent.toString());
         AlipayTradeQueryResponse response = alipayClient.execute(request);
-        if (response.isSuccess()) {
-            //获取支付结果
-            String resultJson = response.getBody();
-            //转map
-            Map resultMap = JSON.parseObject(resultJson, Map.class);
-            Map alipay_trade_query_response = (Map) resultMap.get("alipay_trade_query_response");
-            String trade_no = (String) alipay_trade_query_response.get("trade_no");
-            alipayInfo.setPayStatus(Integer.valueOf(PayOrderEnum.COMPLETE.getValue()));
-            alipayInfo.setAlipayId(trade_no);
-            boolean b = alipayInfoService.updateById(alipayInfo);
-            if (!b) {
-                throw new BusinessException(ErrorCode.PARAMS_ERROR);
-            }
-            AiFrequencyOrder order = getOrder(orderId);
-            order.setOrderStatus(Integer.valueOf(PayOrderEnum.COMPLETE.getValue()));
-            aiFrequencyOrderService.updateById(order);
-            // 获取充值次数
-            Long total = order.getPurchaseQuantity();
-            Long userId = order.getUserId();
-            AiFrequency aiFrequency = getHartFrequency(userId);
-            if (aiFrequency == null) {
-                AiFrequency frequency = new AiFrequency();
-                frequency.setUserId(userId);
-                frequency.setTotalFrequency(Integer.valueOf(PayOrderEnum.WAITPAY.getValue()));
-                frequency.setRemainFrequency(Math.toIntExact(total));
-                boolean save = aiFrequencyService.save(frequency);
-                if (!save) {
-                    throw new BusinessException(ErrorCode.SYSTEM_ERROR, "支付成功回调发生错误");
-                }
-            } else {
-                Integer leftNum = aiFrequency.getRemainFrequency();
-                int i = Math.toIntExact(total);
-                aiFrequency.setRemainFrequency(leftNum + i);
-                boolean b1 = aiFrequencyService.updateById(aiFrequency);
-                if (!b1) {
-                    throw new BusinessException(ErrorCode.SYSTEM_ERROR, "支付成功回调发生错误");
-                }
-            }
-            System.out.println("调用成功，结果：" + response.getBody());
-            return ResultUtils.success("成功");
-        } else {
-            System.out.println("调用失败");
-            return ResultUtils.success("失败");
+        if (!response.isSuccess()) {
+            log.error("查询交易结果失败");
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "调用失败");
         }
+        //获取支付结果
+        String resultJson = response.getBody();
+        //转map
+        Map resultMap = JSON.parseObject(resultJson, Map.class);
+        Map alipay_trade_query_response = (Map) resultMap.get("alipay_trade_query_response");
+        String trade_no = (String) alipay_trade_query_response.get("trade_no");
+        alipayInfo.setPayStatus(Integer.valueOf(PayOrderEnum.COMPLETE.getValue()));
+        alipayInfo.setAlipayId(trade_no);
+        boolean updateComplete = alipayInfoService.updateById(alipayInfo);
+        if (!updateComplete) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        AiFrequencyOrder order = getOrder(orderId);
+        order.setOrderStatus(Integer.valueOf(PayOrderEnum.COMPLETE.getValue()));
+        aiFrequencyOrderService.updateById(order);
+        // 获取充值次数
+        Long total = order.getPurchaseQuantity();
+        Long userId = order.getUserId();
+        AiFrequency aiFrequency = getHartFrequency(userId);
+
+        if (aiFrequency == null) {
+            AiFrequency frequency = new AiFrequency();
+            frequency.setUserId(userId);
+            frequency.setTotalFrequency(Integer.valueOf(PayOrderEnum.WAITPAY.getValue()));
+            frequency.setRemainFrequency(Math.toIntExact(total));
+            boolean save = aiFrequencyService.save(frequency);
+            if (!save) {
+                throw new BusinessException(ErrorCode.SYSTEM_ERROR, "支付成功回调发生错误");
+            }
+        }
+        Integer remainFrequency = aiFrequency.getRemainFrequency();
+        int i = Math.toIntExact(total);
+        aiFrequency.setRemainFrequency(remainFrequency + i);
+        boolean updateFrequency = aiFrequencyService.updateById(aiFrequency);
+        if (!updateFrequency) {
+            throw new BusinessException(ErrorCode.SYSTEM_ERROR, "支付成功回调发生错误");
+        }
+        log.info("调用成功，结果：" + response.getBody());
+        //return ResultUtils.success(resultJson);
     }
 
     /**
@@ -212,12 +218,14 @@ public class AliPayController {
      * @param alipayAccountNo 支付交易号
      * @return 支付结果
      */
+    @PostMapping("/query/payNo")
+    @ResponseBody
     public void queryPayResultFromAlipay(String alipayAccountNo) {
         AlipayClient alipayClient = new DefaultAlipayClient(URL, APP_ID, APP_PRIVATE_KEY, "json", CHARSET, ALIPAY_PUBLIC_KEY, SIGNTYPE);
         AlipayTradeQueryRequest request = new AlipayTradeQueryRequest();
         JSONObject bizContent = new JSONObject();
         try {
-            bizContent.put("alipay_account_no", alipayAccountNo);
+            bizContent.put("out_trade_no", alipayAccountNo);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -243,15 +251,6 @@ public class AliPayController {
         String trade_status = (String) alipay_trade_query_response.get("trade_status");
         String total_amount = (String) alipay_trade_query_response.get("total_amount");
         String trade_no = (String) alipay_trade_query_response.get("trade_no");
-
-        //保存支付结果
-//        PayStatusDto payStatusDto = new PayStatusDto();
-//        payStatusDto.setOut_trade_no(alipayAccountNo);
-//        payStatusDto.setTrade_status(trade_status);
-//        payStatusDto.setApp_id(APP_ID);
-//        payStatusDto.setTrade_no(trade_no);
-//        return payStatusDto;
-
     }
 
     /**
@@ -271,7 +270,7 @@ public class AliPayController {
     }
 
     /**
-     * 获取AiFrequencyOrder
+     * 获取Ai次数订单
      *
      * @param orderId
      * @return
@@ -287,7 +286,7 @@ public class AliPayController {
     }
 
     /***
-     * 获取AiFrequency
+     * 获取Ai调用次数
      * @param userId
      * @return
      */

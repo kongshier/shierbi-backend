@@ -15,13 +15,13 @@ import java.util.Map;
 @Configuration
 public class OrderDelayedQueueConfig {
 
-    //普通交换机的名称
+    // 普通交换机的名称
     public static final String X_EXCHANGE="order_exchange";
-    //死信交换机的名称
+    // 死信交换机的名称
     public static final String Y_DEAD_LETTER_EXCHANGE="order_delayed_exchange";
-    //普通队列的名称
+    // 普通队列的名称
     public static final String QUEUE_A="order_queue";
-    //死信队列的名称
+    // 死信队列的名称
     public static final String QUEUE_B="order_delayed_queue";
 
     //声明xExchange  别名

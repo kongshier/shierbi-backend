@@ -40,7 +40,7 @@ public class AiFrequencyController {
      * @return
      */
     @GetMapping("/get")
-    public BaseResponse<AiFrequencyVO> getChartFrequency(HttpServletRequest request) {
+    public BaseResponse<AiFrequencyVO> getAiFrequency(HttpServletRequest request) {
         User loginUser = userService.getLoginUser(request);
         QueryWrapper<AiFrequency> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("userId", loginUser.getId());

@@ -224,7 +224,6 @@ public class ChartController {
         if (chartQueryRequest == null) {
             return queryWrapper;
         }
-
         Long id = chartQueryRequest.getId();
         String goal = chartQueryRequest.getGoal();
         String chartName = chartQueryRequest.getChartName();
@@ -238,7 +237,6 @@ public class ChartController {
         queryWrapper.like(ObjectUtils.isNotEmpty(chartName), "chartName", chartName);
         queryWrapper.eq(ObjectUtils.isNotEmpty(chartType), "chartType", chartType);
         queryWrapper.eq(ObjectUtils.isNotEmpty(userId), "userId", userId);
-
         queryWrapper.eq("isDelete", false);
         queryWrapper.orderBy(SqlUtils.validSortField(sortField), sortOrder.equals(CommonConstant.SORT_ORDER_ASC),
                 sortField);

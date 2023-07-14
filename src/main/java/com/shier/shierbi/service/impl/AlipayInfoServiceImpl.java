@@ -28,12 +28,13 @@ public class AlipayInfoServiceImpl extends ServiceImpl<AlipayInfoMapper, AlipayI
 
     @Override
     public long getPayNo(long orderId, long userId) {
+
         AiFrequencyOrder getOrder = getOrder(orderId);
-        Integer status = getOrder.getOrderStatus();
-        if (status == 1) {
+        Integer orderStatus = getOrder.getOrderStatus();
+        if (orderStatus == 1) {
             throw new BusinessException(ErrorCode.SYSTEM_ERROR, "订单已支付");
         }
-        if (status == 2) {
+        if (orderStatus == 2) {
             throw new BusinessException(ErrorCode.SYSTEM_ERROR, "订单已过期，请重新生成订单");
         }
         Double totalAmount = getOrder.getTotalAmount();

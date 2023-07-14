@@ -1,7 +1,7 @@
 package com.shier.shierbi.service;
 
-import com.shier.shierbi.model.entity.AlipayInfo;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.shier.shierbi.model.entity.AlipayInfo;
 
 /**
 * @author Shier
@@ -10,6 +10,6 @@ import com.baomidou.mybatisplus.extension.service.IService;
 */
 public interface AlipayInfoService extends IService<AlipayInfo> {
 
-    long getPayNo(long orderId,long userId);
+    long getPayNo(long orderId, long userId);
 
 }
