@@ -10,11 +10,15 @@ import com.shier.shierbi.mapper.AiFrequencyOrderMapper;
 import com.shier.shierbi.model.dto.order.AiFrequencyOrderQueryRequest;
 import com.shier.shierbi.model.dto.order.AiFrequencyOrderUpdateRequest;
 import com.shier.shierbi.model.entity.AiFrequencyOrder;
+import com.shier.shierbi.model.entity.User;
+import com.shier.shierbi.model.enums.PayOrderEnum;
 import com.shier.shierbi.service.AiFrequencyOrderService;
+import com.shier.shierbi.service.UserService;
 import com.shier.shierbi.utils.SqlUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
 /**
@@ -25,6 +29,9 @@ import javax.servlet.http.HttpServletRequest;
 @Service
 public class AiFrequencyOrderServiceImpl extends ServiceImpl<AiFrequencyOrderMapper, AiFrequencyOrder>
         implements AiFrequencyOrderService {
+
+    @Resource
+    private UserService userService;
 
 
     /**
@@ -57,21 +64,25 @@ public class AiFrequencyOrderServiceImpl extends ServiceImpl<AiFrequencyOrderMap
      */
     @Override
     public boolean updateOrderInfo(AiFrequencyOrderUpdateRequest orderUpdateRequest, HttpServletRequest request) {
-        Double totalAmount = orderUpdateRequest.getTotalAmount();
+        Long purchaseQuantity = orderUpdateRequest.getPurchaseQuantity();
         Long id = orderUpdateRequest.getId();
-        Long userId = orderUpdateRequest.getUserId();
-        if (orderUpdateRequest == null) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        User loginUser = userService.getLoginUser(request);
+        if (id < 0) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "订单不存在");
         }
-        if (userId < 0) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+
+        if (loginUser == null) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "用户未登录");
         }
-        if (totalAmount < 0) {
+        if (purchaseQuantity < 0) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "输入正确的购买数量");
         }
         AiFrequencyOrder order = new AiFrequencyOrder();
         BeanUtils.copyProperties(orderUpdateRequest, order);
         order.setId(id);
+        Double price = 0.1;
+        order.setTotalAmount(purchaseQuantity * price);
+        order.setOrderStatus(Integer.valueOf(PayOrderEnum.WAIT_PAY.getValue()));
         boolean result = this.updateById(order);
         ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR);
         return true;

@@ -18,6 +18,7 @@ import com.shier.shierbi.model.entity.AiAssistant;
 import com.shier.shierbi.model.entity.User;
 import com.shier.shierbi.model.enums.AiAssistantStatusEnum;
 import com.shier.shierbi.service.AiAssistantService;
+import com.shier.shierbi.service.AiFrequencyService;
 import com.shier.shierbi.service.UserService;
 import com.shier.shierbi.utils.SqlUtils;
 import io.swagger.annotations.Api;
@@ -49,6 +50,9 @@ public class AiAssistantController {
 
     @Resource
     private AiAssistantService aiAssistantService;
+
+    @Resource
+    private AiFrequencyService aiFrequencyService;
 
     @Resource
     private UserService userService;
@@ -274,9 +278,15 @@ public class AiAssistantController {
         String questionName = genChatByAiRequest.getQuestionName();
         String questionGoal = genChatByAiRequest.getQuestionGoal();
         String questionType = genChatByAiRequest.getQuestionType();
-
         User loginUser = userService.getLoginUser(request);
 
+        // 查询是否有调用次数
+        boolean hasFrequency = aiFrequencyService.hasFrequency(loginUser.getId());
+        if (!hasFrequency) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "剩余次数不足，请先充值！");
+        }
+
+        // 校验
         if (StringUtils.isBlank(questionName)) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "问题名称为空");
         }
@@ -295,9 +305,6 @@ public class AiAssistantController {
             throw new BusinessException(ErrorCode.TOO_MANY_REQUEST);
         }
 
-        // long biModelId = modelIdProperties.getAssistant();
-
-        // String result = aiHelper.doChat(biModelId, goal);
         AiAssistant aiAssistant = new AiAssistant();
         aiAssistant.setQuestionName(questionName);
         aiAssistant.setQuestionGoal(questionGoal);
@@ -311,6 +318,10 @@ public class AiAssistantController {
 
         String json = GSON.toJson(aiAssistant);
         rabbitTemplate.convertAndSend(AI_QUESTION_EXCHANGE_NAME, AI_QUESTION_ROUTING_KEY, json);
+
+        // 调用次数减一
+        boolean invokeAutoDecrease = aiFrequencyService.invokeAutoDecrease(loginUser.getId());
+        ThrowUtils.throwIf(!invokeAutoDecrease, ErrorCode.PARAMS_ERROR, "次数减一失败");
 
         ThrowUtils.throwIf(!save, ErrorCode.SYSTEM_ERROR, "保存失败");
         return ResultUtils.success(aiAssistant);

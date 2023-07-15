@@ -33,7 +33,7 @@ import java.util.List;
  * @author Shier
  */
 @RestController
-@RequestMapping("/pay_info")
+@RequestMapping("/payInfo")
 //@CrossOrigin(origins = "http://bi.kongshier.top", allowCredentials = "true")
 @CrossOrigin(origins = "http://localhost:8000", allowCredentials = "true")
 public class AliPayInfoController {

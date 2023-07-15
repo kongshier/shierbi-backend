@@ -220,9 +220,10 @@ public class AiFrequencyOrderController {
         BeanUtils.copyProperties(orderUpdateRequest, aiFrequencyOrder);
         boolean result = aiFrequencyOrderService.updateOrderInfo(orderUpdateRequest, request);
         ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR);
+        // 修改之后进入延迟队列
+        orderManageProducer.sendManage(aiFrequencyOrder);
         return ResultUtils.success(true);
     }
-
 
     /**
      * 获取查询包装类
