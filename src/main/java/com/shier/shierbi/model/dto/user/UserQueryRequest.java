@@ -49,10 +49,5 @@ public class UserQueryRequest extends PageRequest implements Serializable {
      */
     private Integer userStatus;
 
-    /**
-     * 用户编号
-     */
-    private String userCode;
-
     private static final long serialVersionUID = 1L;
 }

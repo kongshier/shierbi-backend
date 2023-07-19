@@ -15,10 +15,12 @@ import com.shier.shierbi.model.dto.user.UserRegisterRequest;
 import com.shier.shierbi.model.dto.user.UserUpdateMyRequest;
 import com.shier.shierbi.model.entity.AiFrequency;
 import com.shier.shierbi.model.entity.User;
+import com.shier.shierbi.model.entity.UserCode;
 import com.shier.shierbi.model.enums.UserRoleEnum;
 import com.shier.shierbi.model.vo.LoginUserVO;
 import com.shier.shierbi.model.vo.UserVO;
 import com.shier.shierbi.service.AiFrequencyService;
+import com.shier.shierbi.service.UserCodeService;
 import com.shier.shierbi.service.UserService;
 import com.shier.shierbi.utils.SqlUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -38,6 +40,7 @@ import static com.shier.shierbi.constant.UserConstant.SALT;
 
 /**
  * 用户服务实现
+ * @author Shier
  */
 @Service
 @Slf4j
@@ -49,8 +52,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Resource
     private AiFrequencyService aiFrequencyService;
 
+    @Resource
+    private UserCodeService userCodeService;
+
+
     /**
      * 用户注册
+     *
      * @param userRegisterRequest
      * @return
      */
@@ -59,7 +67,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         String userAccount = userRegisterRequest.getUserAccount();
         String userPassword = userRegisterRequest.getUserPassword();
         String checkPassword = userRegisterRequest.getCheckPassword();
-        String userCode = userRegisterRequest.getUserCode();
         // 校验
         if (StringUtils.isAnyBlank(userAccount, userPassword, checkPassword)) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "参数为空");
@@ -76,9 +83,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         }
 
         synchronized (userAccount.intern()) {
-            // 账户和编号不能重复
-            isCodeAndAccountExist(userAccount, userCode);
-
+            // 账户不能重复
+            isCodeAndAccountExist(userAccount);
             // 3. 加密
             String encryptPassword = DigestUtils.md5DigestAsHex((SALT + userPassword).getBytes());
 
@@ -88,7 +94,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             user.setUserName(userAccount);
             user.setUserPassword(encryptPassword);
             user.setUserAvatar(DEFAULT_AVATAR);
-            user.setUserCode(userCode);
+            //user.setUserCode(userCode);
             boolean saveResult = this.save(user);
             if (!saveResult) {
                 throw new BusinessException(ErrorCode.SYSTEM_ERROR, "注册失败，数据库错误");
@@ -98,6 +104,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             AiFrequency aiFrequency = new AiFrequency();
             aiFrequency.setUserId(user.getId());
             aiFrequencyService.save(aiFrequency);
+
+            // 用户编号自增
+            UserCode code = new UserCode();
+            code.setUserId(user.getId());
+            userCodeService.save(code);
 
             return user.getId();
         }
@@ -153,14 +164,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         String userAvatar = userAddRequest.getUserAvatar();
         String userPassword = userAddRequest.getUserPassword();
         String userRole = userAddRequest.getUserRole();
-        String userCode = userAddRequest.getUserCode();
         String email = userAddRequest.getEmail();
         String phone = userAddRequest.getPhone();
         String gender = userAddRequest.getGender();
         Integer userStatus = userAddRequest.getUserStatus();
 
         // 账户和编号不能重复
-        isCodeAndAccountExist(userAccount, userCode);
+        isCodeAndAccountExist(userAccount);
         // 加密
         String encryptPassword = DigestUtils.md5DigestAsHex((SALT + userPassword).getBytes());
         User user = new User();
@@ -169,13 +179,18 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         user.setUserRole(userRole);
         user.setUserAccount(userAccount);
         user.setUserPassword(encryptPassword);
-        user.setUserCode(userCode);
         user.setUserStatus(userStatus);
         user.setEmail(email);
         user.setGender(gender);
         user.setPhone(phone);
         boolean result = this.save(user);
         ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR);
+
+        // 用户编号自增
+        UserCode code = new UserCode();
+        code.setUserId(user.getId());
+        userCodeService.save(code);
+
         return user.getId();
     }
 
@@ -312,15 +327,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Override
     public boolean updateMyUser(UserUpdateMyRequest userUpdateMyRequest, HttpServletRequest request) {
 
-        String userCode = userUpdateMyRequest.getUserCode();
-        // 用户编号不能重复
-        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("userCode", userCode);
-        long count = userMapper.selectCount(queryWrapper);
-        if (count > 1) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR, "编号已存在");
-        }
-
         User loginUser = this.getLoginUser(request);
         User user = new User();
         BeanUtils.copyProperties(userUpdateMyRequest, user);
@@ -334,22 +340,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
      * 判断账号和编号是否重复
      *
      * @param userAccount
-     * @param userCode
      */
-    private void isCodeAndAccountExist(String userAccount, String userCode) {
+    private void isCodeAndAccountExist(String userAccount) {
         // 账户不能重复
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("userAccount", userAccount);
         long count = userMapper.selectCount(queryWrapper);
         if (count > 0) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "账号重复");
-        }
-        // 用户编号不能重复
-        queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("userCode", userCode);
-        count = userMapper.selectCount(queryWrapper);
-        if (count > 0) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR, "编号已存在");
         }
     }
 }

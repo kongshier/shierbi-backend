@@ -1,5 +1,6 @@
 package com.shier.shierbi.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.shier.shierbi.annotation.AuthCheck;
 import com.shier.shierbi.common.BaseResponse;
@@ -11,8 +12,11 @@ import com.shier.shierbi.exception.BusinessException;
 import com.shier.shierbi.exception.ThrowUtils;
 import com.shier.shierbi.model.dto.user.*;
 import com.shier.shierbi.model.entity.User;
+import com.shier.shierbi.model.entity.UserCode;
 import com.shier.shierbi.model.vo.LoginUserVO;
+import com.shier.shierbi.model.vo.UserCodeVO;
 import com.shier.shierbi.model.vo.UserVO;
+import com.shier.shierbi.service.UserCodeService;
 import com.shier.shierbi.service.UserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -34,11 +38,16 @@ import java.util.List;
 @Api(tags = "UserController")
 @RequestMapping("/user")
 @Slf4j
-//@CrossOrigin(origins = "http://bi.kongshier.top", allowCredentials = "true")
-@CrossOrigin(origins = "http://localhost:8000", allowCredentials = "true")
+@CrossOrigin(origins = "http://bi.kongshier.top", allowCredentials = "true")
+//@CrossOrigin(origins = "http://localhost:8000", allowCredentials = "true")
 public class UserController {
     @Resource
     private UserService userService;
+
+
+    @Resource
+    private UserCodeService userCodeService;
+
 
     /**
      * 用户注册
@@ -56,9 +65,8 @@ public class UserController {
         String userPassword = userRegisterRequest.getUserPassword();
         String checkPassword = userRegisterRequest.getCheckPassword();
         if (StringUtils.isAnyBlank(userAccount, userPassword, checkPassword)) {
-            throw new BusinessException(ErrorCode.NULL_ERROR,"参数为空");
+            throw new BusinessException(ErrorCode.NULL_ERROR, "参数为空");
         }
-
         long result = userService.userRegister(userRegisterRequest);
         return ResultUtils.success(result);
     }
@@ -176,6 +184,7 @@ public class UserController {
 
     /**
      * 用户更新信息
+     *
      * @param userUpdateRequest
      * @param request
      * @return
@@ -183,7 +192,7 @@ public class UserController {
     @PostMapping("/update/user")
     @ApiOperation(value = "更新用户信息")
     public BaseResponse<Boolean> updateByProfileUser(@RequestBody UserUpdateRequest userUpdateRequest,
-                                            HttpServletRequest request) {
+                                                     HttpServletRequest request) {
         if (userUpdateRequest == null || userUpdateRequest.getId() == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
@@ -222,10 +231,19 @@ public class UserController {
      */
     @GetMapping("/get/vo")
     @ApiOperation(value = "根据 id 获取包装类")
-    public BaseResponse<UserVO> getUserVOById(long id, HttpServletRequest request) {
+    public BaseResponse<UserCodeVO> getUserVOById(long id, HttpServletRequest request) {
         BaseResponse<User> response = getUserById(id, request);
+        QueryWrapper<UserCode> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("userId", id);
+        UserCode userCode = userCodeService.getOne(queryWrapper);
         User user = response.getData();
-        return ResultUtils.success(userService.getUserVO(user));
+        // 脱敏，将密码设置为空
+        user.setUserPassword("");
+        UserCodeVO userCodeVO = new UserCodeVO();
+        // 将user的属性复制给userCodeVO
+        BeanUtils.copyProperties(user, userCodeVO);
+        userCodeVO.setId(userCode.getId());
+        return ResultUtils.success(userCodeVO);
     }
 
     /**

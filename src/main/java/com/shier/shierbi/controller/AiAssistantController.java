@@ -44,8 +44,8 @@ import static com.shier.shierbi.constant.BiMqConstant.AI_QUESTION_ROUTING_KEY;
 @RequestMapping("/aiAssistant")
 @Api(tags = "AiAssistantController")
 @Slf4j
-//@CrossOrigin(origins = "http://bi.kongshier.top", allowCredentials = "true")
-@CrossOrigin(origins = "http://localhost:8000", allowCredentials = "true")
+@CrossOrigin(origins = "http://bi.kongshier.top", allowCredentials = "true")
+//@CrossOrigin(origins = "http://localhost:8000", allowCredentials = "true")
 public class AiAssistantController {
 
     @Resource

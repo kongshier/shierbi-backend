@@ -34,8 +34,8 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/payInfo")
-//@CrossOrigin(origins = "http://bi.kongshier.top", allowCredentials = "true")
-@CrossOrigin(origins = "http://localhost:8000", allowCredentials = "true")
+@CrossOrigin(origins = "http://bi.kongshier.top", allowCredentials = "true")
+//@CrossOrigin(origins = "http://localhost:8000", allowCredentials = "true")
 public class AliPayInfoController {
 
     @Resource

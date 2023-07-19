@@ -63,10 +63,6 @@ public class LoginUserVO implements Serializable {
      */
     private Integer userStatus;
 
-    /**
-     * 用户编号
-     */
-    private String userCode;
 
     /**
      * 创建时间

@@ -53,10 +53,6 @@ public class UserVO implements Serializable {
      */
     private Integer userStatus;
 
-    /**
-     * 用户编号
-     */
-    private String userCode;
 
     /**
      * 用户账号

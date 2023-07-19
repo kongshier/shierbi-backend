@@ -8,10 +8,11 @@ import java.util.Date;
 
 /**
  * 用户
+ *
  * @author Shier
  * @TableName user
  */
-@TableName(value ="user")
+@TableName(value = "user")
 @Data
 public class User implements Serializable {
     /**
@@ -66,10 +67,6 @@ public class User implements Serializable {
      */
     private Integer userStatus;
 
-    /**
-     * 用户编号
-     */
-    private String userCode;
 
     /**
      * 创建时间

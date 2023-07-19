@@ -19,11 +19,22 @@ create table if not exists user
     phone        varchar(128)                           null comment '电话',
     email        varchar(512)                           null comment '邮箱',
     userStatus   int          default 0                 not null comment '状态 0 - 正常 1-注销 2-封号',
-    userCode     varchar(512)                           null comment '用户编号',
     createTime   datetime     default CURRENT_TIMESTAMP not null comment '创建时间',
     updateTime   datetime     default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '更新时间',
     isDelete     tinyint      default 0                 not null comment '是否删除',
     index idx_userAccount (userAccount)
+) comment '用户' collate = utf8mb4_unicode_ci;
+
+
+-- 用户编号表
+create table if not exists user_code
+(
+    id         bigint auto_increment comment 'id' primary key,
+    userId     bigint                             not null comment '用户id',
+    createTime datetime default CURRENT_TIMESTAMP not null comment '创建时间',
+    updateTime datetime default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '更新时间',
+    isDelete   tinyint  default 0                 not null comment '是否删除',
+    index idx_userAccount (id)
 ) comment '用户' collate = utf8mb4_unicode_ci;
 
 -- 图表信息表

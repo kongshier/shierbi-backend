@@ -24,7 +24,7 @@ public class UserServiceTest {
         registerRequest.setUserAccount("shier");
         registerRequest.setUserPassword("123456789");
         registerRequest.setCheckPassword("123456789");
-        registerRequest.setUserCode("001");
+        //registerRequest.setUserCode("001");
         //try {
         //    long result = userService.userRegister(registerRequest);
         //    Assertions.assertEquals(-1, result);

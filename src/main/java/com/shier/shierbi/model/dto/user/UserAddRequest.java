@@ -32,10 +32,6 @@ public class UserAddRequest implements Serializable {
      */
     private String userPassword;
 
-    /**
-     * 用户编号
-     */
-    private String userCode;
 
     /**
      * 用户角色: user, admin

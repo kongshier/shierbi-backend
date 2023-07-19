@@ -19,8 +19,8 @@ import javax.annotation.Resource;
 @Api(tags = "文件管理")
 @RestController
 @RequestMapping("/oss")
-@CrossOrigin(origins = "http://localhost:8000", allowCredentials = "true")
-//@CrossOrigin(origins = "http://bi.kongshier.top", allowCredentials = "true")
+//@CrossOrigin(origins = "http://localhost:8000", allowCredentials = "true")
+@CrossOrigin(origins = "http://bi.kongshier.top", allowCredentials = "true")
 public class FileController {
 
     @Resource
