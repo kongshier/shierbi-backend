@@ -6,6 +6,7 @@ package com.shier.shierbi.constant;
  * 应用到BI项目当中的mq常量
  */
 public interface BiMqConstant {
+
     /**
      * 普通交换机
      */
@@ -36,6 +37,22 @@ public interface BiMqConstant {
 
     String AI_QUESTION_QUEUE = "ai_question_queue";
     String AI_QUESTION_ROUTING_KEY = "ai_question_routingKey";
+
+
+    /**
+     * AI对话死信队列交换机
+     */
+    String AI_DLX_EXCHANGE_NAME = "ai-dlx-exchange";
+
+    /**
+     * AI对话死信队列
+     */
+    String AI_DLX_QUEUE_NAME = "ai_dlx_queue";
+
+    /**
+     * AI对话死信队列路由键
+     */
+    String AI_DLX_ROUTING_KEY = "ai_dlx_routingKey";
 
     /**
      * MQ ip地址
