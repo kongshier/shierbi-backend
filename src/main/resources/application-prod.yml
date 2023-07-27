@@ -12,8 +12,8 @@ spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://xxxxx:3306/shierbi?useUnicode=true&characterEncoding=utf-8&serverTimezone=GMT%2B8&useSSL=false
-    username: root
-    password: shier
+    username: xxxxx
+    password: xxxxx
   # session 失效时间 30 天
   session:
     timeout: 2592000
@@ -21,13 +21,13 @@ spring:
   # redis配置
   redis:
     port: 6379
-    host: 8.222
+    host: xxxx
     database: 1
     password: xxxx
   # rabbitmq 信息
   rabbitmq:
-    host: 8.1346.467
-    password: xxxxx
+    host: xxxx
+    password: xxxxxxx
     username: shier
     port: 5672
     listener:
@@ -41,8 +41,23 @@ mybatis-plus:
 ai:
   model:
     model-id: 1660100329896673281
+# 阿里云对象存储
+aliyun:
+  oss:
+    file:
+      endpoint: oss-cn-guangzhou.aliyuncs.com
+      keyid: xxxx
+      keysecret: xxxx
+      bucketname: xxxx
 # 鱼聪明SDK
 yuapi:
   client:
-    access-key: xxxxx
-    secret-key: xxxxx
+    access-key: xxx
+    secret-key: xxxx
+# 支付宝沙箱
+pay:
+  qrcodeurl: http://localhost:8103/api/alipay/tradeQuery?alipayAccountNo=%s
+  alipay:
+    APP_ID: xxxx
+    APP_PRIVATE_KEY: xxx
+    ALIPAY_PUBLIC_KEY: xxxxx

@@ -10,19 +10,16 @@ spring:
       matching-strategy: ant_path_matcher
   # session 配置
   session:
-    # todo 取消注释开启分布式 session（须先配置 Redis）
     # store-type: redis
     # 1 天过期
     timeout: 86400
   # 数据库配置
-  # todo 需替换配置
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3306/shierbi
     username: root
     password: 123456
   # Redis 配置
-  # todo 需替换配置，然后取消注释
   redis:
     database: 4
     host: localhost
@@ -37,9 +34,10 @@ spring:
   # rabbitmq 信息
   rabbitmq:
     host: xxxxx
-    password: xxx
-    username: shier
+    password: xxxxx
+    username: xxxxx
     port: 5672
+    virtual-host: /
     listener:
       direct:
         acknowledge-mode: manual
@@ -61,14 +59,14 @@ mybatis-plus:
       logic-delete-field: isDelete # 全局逻辑删除的实体字段名
       logic-delete-value: 1 # 逻辑已删除值（默认为 1）
       logic-not-delete-value: 0 # 逻辑未删除值（默认为 0）
-# 对象存储
-# todo 需替换配置
-cos:
-  client:
-    accessKey: xxx
-    secretKey: xxx
-    region: xxx
-    bucket: xxx
+# 阿里云对象存储
+aliyun:
+  oss:
+    file:
+      endpoint: xxxx
+      keyid: xxxx
+      keysecret: xxxx
+      bucketname: xxxx
 # 要使用的模型ID
 ai:
   model:
@@ -76,13 +74,12 @@ ai:
 # 鱼聪明SDK
 yuapi:
   client:
-    access-key: izvszyxh5ndyccuuhkxseft959h37idh
-    secret-key: ktek1dp71r257jqfpx173nv98xzwpbi9
-# todo 需替换配置
-aliyun:
-  oss:
-    file:
-      endpoint: xxxxxxxxxxxxx
-      keyid: xxxxxxxxxxxxx
-      keysecret: xxxxxxxxxxxxx
-      bucketname: xxxxxxxxxxxxx
+    access-key: xxxx
+    secret-key: xxxx
+# 支付宝沙箱
+pay:
+  qrcodeurl: http://localhost:8103/api/alipay/tradeQuery?alipayAccountNo=%s
+  alipay:
+    APP_ID: xxx
+    APP_PRIVATE_KEY: xxxxx
+    ALIPAY_PUBLIC_KEY: xxxx
