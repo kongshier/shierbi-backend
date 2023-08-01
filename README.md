@@ -4,9 +4,10 @@
 
 ## 项目介绍
 本项目是基于React+Spring Boot+RabbitMQ+AIGC的智能BI数据分析平台。
-来源自[编程导航](https://yupi.icu)
+
 访问地址：http://bi.kongshier.top
 
+来源自[编程导航](https://yupi.icu)
 > AIGC ：Artificial Intelligence Generation Content(AI 生成内容)
 
 区别于传统的BI，数据分析者只需要导入最原始的数据集，输入想要进行分析的目标，就能利用AI自动生成一个符合要求的图表以及分析结论。此外，还会有图表管理、异步生成、AI对话等功能。只需输入分析目标、原始数据和原始问题，利用AI就能一键生成可视化图表、分析结论和问题解答，大幅降低人工数据分析成本。
