@@ -126,6 +126,7 @@
 
 
 ### 目录结构
+```
 ├─main
 │  ├─java
 │  │  └─com
@@ -363,6 +364,7 @@
                     │
                     └─utils
                             EasyExcelTest.java
+```
 
 ## BI项目展示
 ### 用户登录注册
